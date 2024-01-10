@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Livestreaming</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+</head>
+<body>
+    <div class="login">
+        <div class="header">
+            <img src="/static/images/drone.png" alt="logo">
+            <h1>User Login</h1>
+            <div>
+                <form action="{{ url_for('login') }}" method="post">
+                    <label for="username">
+                        <i class="fas fa-user"></i>
+                    </label>
+                    <input type="text" name="username" placeholder="Username" id="username" required oninvalid="this.setCustomValidity('Login ID is required')">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                    </label>
+                    <input type="password" name="password" placeholder="Password" id="password" required oninvalid="this.setCustomValidity('Password is required')">
+                    <div class="msg">{{ msg }}</div>
+                    <div class="d-flex">
+                        <div class="w-50 text-left">
+                            <p style="text-align:center;" >Select login status</p>
+                            <select class="select" id="role" name="login_type" required oninvalid="this.setCustomValidity('Login status is required')">
+                                <option value="members">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <input type="submit" value="Login">
+                </form>
+            </div>
+        </div>
+    </div>
+</body>

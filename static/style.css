@@ -1,0 +1,348 @@
+/* 
+COMMON Values:
+
+box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+#E7F9F9 light-green bg
+#46CDCF primary-green
+*/
+
+/********************
+Global Theme 
+********************/
+html,body{
+    padding: 0;
+    margin: 0;
+    background-color: #E7F9F9;
+    width: 100%;
+    height: 100vh;
+}
+
+.mycontainer{
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    border-radius: 30px !important;
+    background-color: white !important;
+    padding: 1.5rem !important;
+    margin-bottom: 40px;
+}
+
+.btn_mygreen, .bg_mygreen{
+    background-color:#46CDCF;
+    border-color: #46CDCF;
+    color: #fff;
+}
+
+.btn_mygreen:hover,
+.btn_mygreen:focus{
+    color: #fff;
+    background-color:#46CDCF;
+    border-color: #46CDCF;
+    transition: 0.25s;
+    transform: translateY(-0.25em);
+}
+
+a{
+    color: #46CDCF;
+}
+
+a:hover{
+    color: #3D84A8;
+}
+
+.mygreen{
+    color: #46CDCF;
+}
+
+.mydarkgreen, h1,h2,h3,h4,h5,h6{
+    color: #3D84A8;
+}
+
+
+/********************
+Global Theme End 
+********************/
+
+
+
+
+/********************
+Styling Sidebar 
+********************/
+
+#sidebar{
+    border-radius: 0 50px 0 0;
+    z-index: 20;
+    position: fixed;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+/* Change The Sidebar Nav Item To Fill Width */
+.nav-item{
+    width: 200px;
+}
+
+.nav-item-clicked{
+    width: 200px;
+    background-color: #3b39c9;
+    border-radius: 15px;
+}
+
+.nav-item-unclicked{
+    width: 200px;
+    background-color: #3b39c996;
+    border-radius: 15px;
+    opacity: 0.8;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link{
+    background-color: #3b39c9;
+    color: white;
+}
+
+#menu .nav-link{
+    border-radius: 15px;
+    font-weight: bold;
+}
+
+.nav-link{
+    color: #3b39c9;
+}
+
+.nav-link-explore{
+    color: #fff;
+}
+
+.nav-link-explore:hover{
+    color: #fff;
+    opacity: 0.8;
+}
+
+.nav-link-report{
+    color: #fff;
+}
+
+.nav-link-report:hover{
+    color: #fff;
+    opacity: 0.8;
+}
+
+.nav-link:hover{
+    color: #3b39c9;
+    opacity: 0.8;
+}
+
+#menu .nav-link:hover:not(.active){
+    background-color: #E7F9F9;
+}
+
+#profile{
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    border-radius: 30px !important;
+    background-color: white !important;
+}
+
+
+/********************
+ Sidebar End 
+********************/
+
+
+
+
+/********************
+Styling Topbar 
+********************/
+
+#topbar_container{
+    padding: 0 5% 0 0;
+    top:0;
+    background-color: #E7F9F9;
+    position: fixed;
+    z-index: 10;
+}
+
+#page_title{
+    color: #3D84A8;
+}
+
+/* Responsive Sidebar with topbar and right container width */
+  @media (max-width: 575.98px) {
+    #right_container{
+        padding-left: 25%;
+    }
+    #topbar{
+        width: 65%;
+    }
+ 
+  }
+  @media (min-width: 576px) { 
+    #right_container{
+        padding-left: 35%;
+    }
+    #topbar{
+        width: 55%;
+    }
+  
+  }
+  @media (min-width: 768px) { 
+    #right_container{
+        padding-left: 30%;
+    }
+    #topbar{
+        width:70%;
+    }
+  
+  }
+  @media (min-width: 1200px) { 
+    #right_container{
+        padding-left: 20%;
+    }
+    #topbar{
+        width: 80%;
+    }
+  }
+  @media (min-width: 1500px) { 
+    #right_container{
+        padding-left: 20%;
+    }
+    #topbar{
+        width: 80%;
+    }
+  }
+/* Responsive bar end */
+
+#top_searchbar:focus, .btn:focus{
+    outline: none !important;
+    box-shadow: none;  
+}
+
+/********************
+Topbar End 
+********************/
+
+/********************
+Main Content Continer (inside right container below the topbar)  
+********************/
+.main_content_container{
+    margin-top:100px ;
+}
+
+.profile-pic{
+    margin-top: 10px;
+    text-align: center;
+}
+
+.profile-details{
+    margin-top: 10px;
+    color: #3D84A8;
+    font-size: 20px;
+}
+
+.form-group{
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.suggestion-button{
+    background-color: #3b39c9;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    width: 180px;
+    height: 36px;
+    font-weight: 500;
+}
+
+.suggestion-button:hover{
+    color: #fff;
+    opacity: 0.8;
+}
+
+.card-title{
+    color: #3D84A8;
+    font-size: 25px;
+    padding: 10px;
+    font-weight: 500;
+}
+
+.card-details{
+    color: #3b39c9;
+    font-size: 15px;
+    padding: 10px
+}
+
+.background-img {
+    background-image: url('images/background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+/********************
+Main Content Container End 
+********************/
+
+/* Style for the label */
+#labelrtmpURL {
+    padding: 10px;
+    display: block;
+    margin-bottom: 10px;
+    font-size: 25px;
+    color: #333;
+  }
+  
+  /* Style for the input field */
+  #rtmpURL {
+    width: 60%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Style for the submit button */
+  #submitButton {
+    width: 120px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #4CAF50; 
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  #imgButton {
+    width: 120px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #EE4B2B;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  /* Hover effect for the submit button */
+  #submitButton:hover {
+    background-color: #c8edc8;
+    color: #4CAF50; 
+  }
+
+  #imgButton:hover {
+    background-color: #eabcb3; 
+    color: #EE4B2B;
+  }
+
+
+  /* ##############report */
+
+.chart-container {
+/* Set a max width if needed */
+max-width: 100%;
+}
+
+/* Set a fixed width for the canvas (chart) */
+canvas {
+    width: 900x !important; /* Adjust this width as needed */
+    height: 400px !important;
+}

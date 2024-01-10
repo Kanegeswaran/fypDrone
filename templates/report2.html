@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block body %}  
+
+<div class="mycontainer px-0 py-0" >
+    <div class="container p-0">
+        <style>
+            .container {
+            width: 1200px;
+            height: 2000px;
+            }
+        </style>
+        <div class="row">
+            <div class="container">
+                <div class="chart-container" style="position: relative; height:450px; width:80%; overflow-x: scroll">
+                    <canvas id="itemChart1"></canvas>
+                </div>
+                <script>
+                    var fetchBag = fetch('/data/plastic_bag', {cache: 'no-store'});
+                    Promise.all([fetchBag]).then(response => response[0].json())
+                        .then(data => {
+                            var ctx = document.getElementById('itemChart1').getContext('2d');
+                            sessionStorage.setItem("total_bag", String(data.total));
+                            var chart = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: data.timestamp,
+                                    datasets: [{
+                                        label: 'Bag Count',
+                                        data: data.item_count,
+                                        borderColor: 'rgb(255, 99, 132)',
+                                        tension: 0.1
+                                    }]
+                                },
+                                options: {
+                                    responsive: false,
+                                    maintainAspectRatio: false
+                                }
+                            });
+                        })
+                        .catch(error => console.error('Error fetching data:', error));;
+                </script>
+                <div class="chart-container" style="position: relative; height:450px; width:80%; overflow-x: scroll; margin-top: 50px;">
+                    <canvas id="itemChart2"></canvas>
+                </div>
+                <script>
+                    var fetchBottle = fetch('/data/plastic_bottle', {cache: 'no-store'});
+                    Promise.all([fetchBottle]).then(response => response[0].json())
+                        .then(data => {
+                            var ctx = document.getElementById('itemChart2').getContext('2d');
+                            sessionStorage.setItem("total_bottle", String(data.total));
+                            console.log(data)
+                            var chart = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: data.timestamp,
+                                    datasets: [{
+                                        label: 'Bottle Count',
+                                        data: data.item_count,
+                                        borderColor: 'rgb(54, 162, 235)',
+                                        tension: 0.1
+                                    }]
+                                },
+                                options: {
+                                    responsive: false,
+                                    maintainAspectRatio: false
+                                }
+                            });
+                        })
+                        .catch(error => console.error('Error fetching data:', error));;
+                </script>
+                <div class="chart-container" style="position: relative; height:450px; width:80%; overflow-x: scroll; margin-top: 50px;">
+                    <canvas id="itemChart3"></canvas>
+                </div>
+                <script>
+                    var fetchCup = fetch('/data/plastic_cup', {cache: 'no-store'});
+                    Promise.all([fetchCup]).then(response => response[0].json())
+                        .then(data => {
+                            var ctx = document.getElementById('itemChart3').getContext('2d');
+                            sessionStorage.setItem("total_cup", String(data.total));
+                            console.log(data)
+                            var chart = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: data.timestamp,
+                                    datasets: [{
+                                        label: 'Cup Count',
+                                        data: data.item_count,
+                                        borderColor: 'rgb(255, 206, 86)',
+                                        tension: 0.1
+                                    }]
+                                },
+                                options: {
+                                    responsive: false,
+                                    maintainAspectRatio: false
+                                }
+                            });
+                        })
+                        .catch(error => console.error('Error fetching data:', error));;
+                </script>
+                <div class="chart-container" style="position: relative; height:450px; width:80%; margin-top: 50px;">
+                    <canvas id="itemChart4"></canvas>
+                </div>
+                <script>
+                    // document.addEventListener('DOMContentLoaded', function () {
+                        var ctx = document.getElementById('itemChart4').getContext('2d');
+
+                        var itemTypes = ['plastic_bag', 'plastic_bottle', 'plastic_cup']; 
+                        var itemCounts = [Number(sessionStorage.getItem('total_bag')), Number(sessionStorage.getItem('total_bottle')), Number(sessionStorage.getItem('total_cup'))];  
+
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: itemTypes,
+                                datasets: [{
+                                    label: '',
+                                    data: itemCounts,
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.2)',
+                                        'rgba(54, 162, 235, 0.2)',
+                                        'rgba(255, 206, 86, 0.2)',
+                                    ],
+                                    borderColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Total Number' 
+                                        },
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        });
+                    // });
+                </script>
+                <a href="/download-pdf/plastic_bag" class="btn btn-primary" style="background-color: rgb(255, 99, 132); border-color: darkred; color:black">Download Bag Report as PDF</a>
+                <a href="/download-pdf/plastic_bottle" class="btn btn-primary" style="background-color: rgb(54, 162, 235, 1); border-color: darkblue; color:black">Download Bottle Report as PDF</a>
+                <a href="/download-pdf/plastic_cup" class="btn btn-primary" style="background-color: rgb(255, 206, 86); border-color: orange; color:black">Download Cup Report as PDF</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('page_title').innerText 
+        = "Livestreaming: Report";
+</script>
+
+{% endblock %}

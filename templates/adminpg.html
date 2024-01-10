@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block body %}  
+<link rel="stylesheet" href="/static/admin.css">
+<script>
+    document.getElementById('page_title').innerText 
+        = "Manage users";
+</script>
+<div class="mycontainer px-0 py-0" >
+    <div class="container p-0">
+        <style>
+            .container {
+            width: 1200px;
+            height: 1100px;
+            }
+        </style>
+        <div class="row">
+            <div class="container">
+                <form action="{{url_for('delete_users')}}" method="post">
+                    <h2>Delete User</h2>
+                    <table>
+                        <tr>
+                            <th>Select</th>
+                            <th>Username</th>
+                        </tr>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="usernames" value="{{ user[0] }}">
+                            </td>
+                            <td>{{ user[0] }}</td> 
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <div class="pagination">
+                        {% if page > 1 %}
+                        <a href="{{ url_for('adminpg', page=page-1) }}">Previous</a>
+                        {% endif %}
+                        <a href="{{ url_for('adminpg', page=page+1) }}">Next</a>
+                    </div>
+                    <div class="button-container">
+                        <input type="submit" value="Delete Selected">
+                    </div>
+                </form>
+                 <!-- New section for creating a user -->
+                <form action="{{ url_for('create_user') }}" method="post" class="create-user-form">
+                    <h2>Create New User</h2>
+                    <div class="form-group">
+                        <label for="new_username">Username:</label>
+                        <input type="text" id="new_username" name="new_username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new_password">Password:</label>
+                        <input type="password" id="new_password" name="new_password" required>
+                    </div>
+                    <div class="err_msg">{{ err_msg }}</div>
+                    <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 15px;">
+                        <p style="text-align:center;" >Select login status:</p>
+                        <select class="form-group" style="margin-left: 10px;" id="new_role" name="new_login_type" required>
+                            <option value="members">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Create User">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{{data}}
+
+{% endblock %}

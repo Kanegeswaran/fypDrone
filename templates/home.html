@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block body %}  
+
+<div class="mycontainer px-0 py-0 background-img">
+    <div class="container p-0">
+    <style>
+        .container {
+        width: 1200px;
+        height: 1000px;
+        }
+    </style>
+        <div class="row">   
+            <div class="container">
+                <h1 class="mb-4" id="thetitle" 
+                        style="font-weight: bold; text-align: center; font-size: 15;">
+                    DRONE POV !
+                </h1>
+                <label for="rtmpURL" id="labelrtmpURL"> Enter RTMP URL: </label>
+                <input type="text" name="rtmpURL" placeholder="RTMP URL" id="rtmpURL" required>
+                <button id="submitButton" onclick="submitURL()"
+                        style="visibility: visible; width: 120px; justify-content: center; align-items: center;">
+                    Start Stream
+                </button>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <img id="image" width="70%" height="640px" style="visibility: hidden;" alt="Video capture could not be opened!">
+                </div>
+                <button id="imgButton" onclick="toggleImage()" 
+                        style="visibility: hidden; width: 120px; justify-content: center; align-items: center;">
+                    End Stream
+                </button>
+                <script src="{{ url_for('static', filename='js/script.js') }}">
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('main_title').innerText = "Livestream: Drone POV";
+</script>
+
+{{data}}
+
+{% endblock %}
+
+<!-- <div class="mycontainer px-0 py-0 background-img">
+    <div class="container p-0">
+    <style>
+        .container {
+        width: 1200px;
+        height: 1000px;
+        }
+    </style>
+        <div class="row">   
+            <div class="container">
+                <h1 class="mb-4" id="thetitle" 
+                        style="font-weight: bold; text-align: center; font-size: 15;">
+                    DRONE POV !
+                </h1>
+                <button id="button" onclick="toggleImage()" 
+                        style="width: 120px; justify-content: center; align-items: center;">
+                    Start Stream
+                </button>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                <img id="image" width="70%" style="display: none;" alt="erro text">
+                </div>
+                <script src="{{ url_for('static', filename='js/script.js') }}">
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('main_title').innerText = "Livestream: Drone POV";
+</script> -->
