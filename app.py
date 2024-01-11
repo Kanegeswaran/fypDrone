@@ -33,8 +33,9 @@ db = mysql.connect(
 
 cv2.cuda.setDevice(0)
 yolov5_path = os.path.join(os.getcwd(), 'yolov5')
-model_path = os.path.join(os.getcwd(), 'yolov5', 'trained_model', 'best.pt')
+model_path = os.path.join(os.getcwd(), 'yolov5', 'trained_model', 'best1.pt')
 model = torch.hub.load(yolov5_path, 'custom', path=model_path, source='local')
+model.to('cuda')
 
 
 def generate_frames(camera, flight_id):

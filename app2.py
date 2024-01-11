@@ -9,11 +9,12 @@ import multiprocessing as mp
 app = Flask(__name__)
 app.secret_key = "Plastic Detection Using Drone"
 # camera = cv2.VideoCapture(0)
-camera = cv2.VideoCapture("rtmp://10.164.37.16:1935/live")
+camera = cv2.VideoCapture("rtmp://10.164.36.54:1935/live")
 
 yolov5_path = os.path.join(os.getcwd(), 'yolov5')
-model_path = os.path.join(os.getcwd(), 'yolov5', 'trained_model', 'best.pt')
+model_path = os.path.join(os.getcwd(), 'yolov5', 'trained_model', 'best1.pt')
 model = torch.hub.load(yolov5_path, 'custom', path=model_path, source='local')
+model.to('cuda')
 
 
 
