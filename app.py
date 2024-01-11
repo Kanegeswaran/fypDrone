@@ -37,8 +37,8 @@ model_path = os.path.join(os.getcwd(), 'yolov5', 'trained_model', 'best.pt')
 model = torch.hub.load(yolov5_path, 'custom', path=model_path, source='local')
 
 
-def generate_frames():
-    camera=cv2.VideoCapture(0)
+def generate_frames(camera, flight_id):
+    # camera=cv2.VideoCapture(0)
     # camera=cv2.VideoCapture("rtmp://10.164.38.255:1935/live")
     cur = db.cursor()
     try:
@@ -53,22 +53,47 @@ def generate_frames():
         if not ret:
             break
         else:
-            start_time = time()
             frame = cv2.resize(frame, dsize=(640,640))
             results = model(frame)
             labels, cord = results.xyxyn[0][:, -1], results.xyxyn[0][:, :-1]
             n = len(labels)
             x_shape, y_shape = frame.shape[1], frame.shape[0]
-            for i in range(n):
-                row = cord[i]
-                if row[4] >= 0.5:
-                    x1,  y1, x2, y2 = int(row[0]*x_shape), int(row[1]*y_shape), int(row[2]*x_shape), int(row[3]*y_shape)
-                    bgr = (0, 255, 0)
-                    cv2.rectangle(frame, (x1,y1), (x2,y2), bgr, 2)
-                    cv2.putText(frame, model.names[int(labels[i])] + ' : '+ str(round(row.cpu().numpy()[4]*100,2)), 
-                                (x1,y1), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
-            end_time = time()
-            fps = 1/np.round(end_time - start_time, 2)
+            count += 1
+            if(count == 1):
+                start_time = time()
+            elif (count == 8 or count == 16 or count == 24):
+                for i in range(n):
+                    row = cord[i]
+                    if row[4] >= 0.5:
+                        x1,  y1, x2, y2 = int(row[0]*x_shape), int(row[1]*y_shape), int(row[2]*x_shape), int(row[3]*y_shape)
+                        img = frame[y1:y2, x1:x2]
+                        bgr = (0, 255, 0)
+                        cv2.rectangle(frame, (x1,y1), (x2,y2), bgr, 2)
+                        pred_class =  model.names[int(labels[i])]
+                        cv2.putText(frame, pred_class + ' : '+ str(round(row.cpu().numpy()[4]*100,2)), 
+                                    (x1,y1), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
+                        img_bytes = cv2.imencode('.jpg', img)[1].tobytes()
+                        if pred_class=='Plastic bag':
+                            cur.execute('INSERT INTO plastic_bag (flight_Id, bag_pic) VALUES (%s,%s)', (flight_id, img_bytes,))
+                            db.commit()
+                            # cur.execute('SELECT LAST_INSERT_ID()')
+                            last_id = cur.lastrowid
+                            print(last_id, " ", cur.rowcount, "inserted into bag table")
+                        elif pred_class=='Plastic bottle' :
+                            cur.execute('INSERT INTO plastic_bottle (flight_Id, bottle_pic) VALUES (%s,%s)', (flight_id, img_bytes,))
+                            db.commit()
+                            last_id = cur.lastrowid
+                            print(last_id, " ", cur.rowcount, "inserted into bottle table")
+                        elif pred_class=='Plastic cup' :
+                            cur.execute('INSERT INTO plastic_cup (flight_Id, cup_pic) VALUES (%s,%s)', (flight_id, img_bytes,))
+                            db.commit()
+                            last_id = cur.lastrowid
+                            print(last_id, " ", cur.rowcount, "inserted into cup table")
+            elif (count >= 25):
+                count = 0
+                end_time = time()
+                fps = 24/np.round(end_time - start_time, 2)
+
             cv2.putText(frame, f'FPS: {int(fps)}', (20,70), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,255,0), 2)
             ret,buffer=cv2.imencode('.jpg',frame)
             frame=buffer.tobytes()
