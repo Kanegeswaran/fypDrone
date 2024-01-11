@@ -24,14 +24,14 @@ app.secret_key = "Plastic Detection Using Drone"
 app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
 
 db = mysql.connect(
-        host="localhost",
-        user="kanag",
-        password="@Dm1n123",
-        database="bonds"
+        host="sql12.freemysqlhosting.net",
+        user="sql12676329",
+        password="1S9CBCJtdr",
+        database="sql12676329"
     )
 
 
-cv2.cuda.setDevice(0)
+# cv2.cuda.setDevice(0)
 yolov5_path = os.path.join(os.getcwd(), 'yolov5')
 model_path = os.path.join(os.getcwd(), 'yolov5', 'trained_model', 'best1.pt')
 model = torch.hub.load(yolov5_path, 'custom', path=model_path, source='local')
@@ -48,6 +48,9 @@ def generate_frames(camera, flight_id):
     except Exception as e:
         print(e)
         custom_shutdown()
+    
+    count = 0
+    fps = 0
     while True:
         ## read the camera frame
         ret,frame=camera.read()
@@ -68,28 +71,30 @@ def generate_frames(camera, flight_id):
                     if row[4] >= 0.5:
                         x1,  y1, x2, y2 = int(row[0]*x_shape), int(row[1]*y_shape), int(row[2]*x_shape), int(row[3]*y_shape)
                         img = frame[y1:y2, x1:x2]
-                        bgr = (0, 255, 0)
-                        cv2.rectangle(frame, (x1,y1), (x2,y2), bgr, 2)
                         pred_class =  model.names[int(labels[i])]
-                        cv2.putText(frame, pred_class + ' : '+ str(round(row.cpu().numpy()[4]*100,2)), 
-                                    (x1,y1), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
                         img_bytes = cv2.imencode('.jpg', img)[1].tobytes()
                         if pred_class=='Plastic bag':
                             cur.execute('INSERT INTO plastic_bag (flight_Id, bag_pic) VALUES (%s,%s)', (flight_id, img_bytes,))
                             db.commit()
                             # cur.execute('SELECT LAST_INSERT_ID()')
                             last_id = cur.lastrowid
+                            color = (54, 162, 235)
                             print(last_id, " ", cur.rowcount, "inserted into bag table")
                         elif pred_class=='Plastic bottle' :
                             cur.execute('INSERT INTO plastic_bottle (flight_Id, bottle_pic) VALUES (%s,%s)', (flight_id, img_bytes,))
                             db.commit()
+                            color = (255, 99, 132)
                             last_id = cur.lastrowid
                             print(last_id, " ", cur.rowcount, "inserted into bottle table")
                         elif pred_class=='Plastic cup' :
                             cur.execute('INSERT INTO plastic_cup (flight_Id, cup_pic) VALUES (%s,%s)', (flight_id, img_bytes,))
                             db.commit()
+                            color = (255, 206, 86)
                             last_id = cur.lastrowid
                             print(last_id, " ", cur.rowcount, "inserted into cup table")
+                        cv2.rectangle(frame, (x1,y1), (x2,y2), color, 2)
+                        cv2.putText(frame, pred_class + ' : '+ str(round(row.cpu().numpy()[4]*100,2)), 
+                                    (x1,y1), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
             elif (count >= 25):
                 count = 0
                 end_time = time()
@@ -135,28 +140,30 @@ def generate_frames_2(camera, flight_id):
                     if row[4] >= 0.5:
                         x1,  y1, x2, y2 = int(row[0]*x_shape), int(row[1]*y_shape), int(row[2]*x_shape), int(row[3]*y_shape)
                         img = frame[y1:y2, x1:x2]
-                        bgr = (0, 255, 0)
-                        cv2.rectangle(frame, (x1,y1), (x2,y2), bgr, 1)
                         pred_class =  model.names[int(labels[i])]
-                        cv2.putText(frame, pred_class + ' : '+ str(round(row.cpu().numpy()[4]*100,2)), 
-                                    (x1,y1), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
                         img_bytes = cv2.imencode('.jpg', img)[1].tobytes()
                         if pred_class=='Plastic bag':
                             cur.execute('INSERT INTO plastic_bag (flight_Id, bag_pic) VALUES (%s,%s)', (flight_id, img_bytes,))
                             db.commit()
+                            color = (54, 162, 235)
                             # cur.execute('SELECT LAST_INSERT_ID()')
                             last_id = cur.lastrowid
                             print(last_id, " ", cur.rowcount, "inserted into bag table")
                         elif pred_class=='Plastic bottle' :
                             cur.execute('INSERT INTO plastic_bottle (flight_Id, bottle_pic) VALUES (%s,%s)', (flight_id, img_bytes,))
                             db.commit()
+                            color = (255, 99, 132)
                             last_id = cur.lastrowid
                             print(last_id, " ", cur.rowcount, "inserted into bottle table")
                         elif pred_class=='Plastic cup' :
                             cur.execute('INSERT INTO plastic_cup (flight_Id, cup_pic) VALUES (%s,%s)', (flight_id, img_bytes,))
                             db.commit()
+                            color = (255, 206, 86)
                             last_id = cur.lastrowid
                             print(last_id, " ", cur.rowcount, "inserted into cup table")
+                        cv2.rectangle(frame, (x1,y1), (x2,y2), color, 1)
+                        cv2.putText(frame, pred_class + ' : '+ str(round(row.cpu().numpy()[4]*100,2)), 
+                                    (x1,y1), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
             elif (count >= 25):
                 count = 0
                 end_time = time()
@@ -287,6 +294,7 @@ def home():
     return render_template('home.html')
 
 
+@app.route('/video/<int:rtmpURL>')
 @app.route('/video/<path:rtmpURL>')
 def video(rtmpURL):
     camera=cv2.VideoCapture(rtmpURL)
@@ -297,7 +305,7 @@ def video(rtmpURL):
             cur.execute('INSERT INTO `flight` VALUES ()')
             db.commit()
             flight_id = cur.lastrowid   
-            return Response(generate_frames_2(camera, flight_id),mimetype='multipart/x-mixed-replace; boundary=frame')
+            return Response(generate_frames(camera, flight_id),mimetype='multipart/x-mixed-replace; boundary=frame')
         # raise ValueError('Video capture could not be opened!')
     except:
         db.rollback()

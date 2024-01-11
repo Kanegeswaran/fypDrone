@@ -26,7 +26,11 @@ function toggleImage() {
       rtmpURL.style.visibility = "hidden";
       image.style.visibility = "visible";
       imgButton.style.visibility = "visible";
-      image.src=("/video/" + encodeURIComponent(rtmpURL.value));
+      if (rtmpURL.value === 0){
+        image.src=("/video/" + rtmpURL.value);
+      }else{
+        image.src=("/video/" + encodeURIComponent(rtmpURL.value));
+      }
     }
     else{
       alert("Invalid RTMP URL!");
