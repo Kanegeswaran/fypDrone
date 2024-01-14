@@ -38,6 +38,31 @@ function toggleImage() {
 
   }
 
+  function cleaning_data() {
+    showLoadingOverlay();
+
+    fetch('/clean_data')  // URL to your Flask route
+        .then(response => response.json())
+        .then(data => {
+            // Process your data
+            console.log(data.cleaned);
+        }) 
+        .catch(error => {
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            hideLoadingOverlay();
+        });
+  }
+
+  function hideLoadingOverlay() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+
+  function showLoadingOverlay() {
+    document.getElementById('loadingOverlay').style.display = 'block';
+  }
+
 
 
 

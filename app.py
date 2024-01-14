@@ -24,10 +24,10 @@ app.secret_key = "Plastic Detection Using Drone"
 app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
 
 db = mysql.connect(
-        host="sql12.freemysqlhosting.net",
-        user="sql12676329",
-        password="1S9CBCJtdr",
-        database="sql12676329"
+        host="localhost",
+        user="kanag",
+        password="@Dm1n123",
+        database="bonds"
     )
 
 
@@ -310,7 +310,68 @@ def video(rtmpURL):
     except:
         db.rollback()
         return None
-        
+
+@app.route('/clean_data')
+def clean_data():
+    table = ('plastic_bag', 'plastic_bottle', 'plastic_cup')
+    col_ids = ('bag_count', 'bottle_count', 'cup_count')
+    col_pics = ('bag_pic', 'bottle_pic', 'cup_pic')
+    for i in range(0,3):
+        table_data(table[i], col_ids[i], col_pics[i])
+
+    return jsonify({'cleaned': True})
+
+def table_data(table, col_id, col_pic):
+    cur = db.cursor()
+    query = 'SELECT max(`flight_Id`) FROM `flight`'
+    cur.execute(query)
+    flight_Id = cur.fetchone()[0]
+    query = 'SELECT FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(timestamp) / 5) * 5) AS time_group, GROUP_CONCAT(%s) AS record_ids FROM %s WHERE flight_Id = %s GROUP BY time_group;' % (col_id,table,flight_Id)
+    cur.execute(query)
+    record_ids = cur.fetchone()
+    while record_ids is not None:
+        ids = record_ids[1].split(',')
+        print(ids)
+        for i in range(len(ids)):
+            for j in range(i+1, len(ids)):
+                cur2 = db.cursor()
+                query = 'SELECT %s FROM %s WHERE %s = %s' % (col_pic, table, col_id, ids[i])
+                cur2.execute(query)
+                result1 = cur2.fetchone()
+                if(result1 is None): continue
+                pic1 = result1[0]
+                query = 'SELECT %s FROM %s WHERE %s = %s' % (col_pic, table, col_id, ids[j])
+                cur2.execute(query)
+                result2 = cur2.fetchone()
+                if(result2 is None): continue
+                pic2 = result2[0]
+                img1 = cv2.imdecode(np.frombuffer(pic1, np.uint8), cv2.IMREAD_COLOR)
+                img2 = cv2.imdecode(np.frombuffer(pic2, np.uint8), cv2.IMREAD_COLOR)
+                if(are_images_similar(img1, img2)):
+                    print('passed if')
+                    query = 'DELETE FROM %s WHERE %s = %s;' % (table, col_id, ids[j])
+                    print('deleted ', ids[j], ' from ', table)
+                    cur2.execute(query)
+                    db.commit()
+                    cur2.close()
+        record_ids = cur.fetchone()
+    return 
+
+def are_images_similar(image1, image2, threshold=100000):
+    # Resize images to a standard size, (100, 100)
+    image1 = cv2.resize(image1, (100, 100))
+    image2 = cv2.resize(image2, (100, 100))
+
+    # Convert images to grayscale
+    gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+    gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+
+    # Compute the difference and sum it
+    difference = cv2.absdiff(gray1, gray2)
+    score = np.sum(difference)
+
+    # If the sum is below the threshold, images are similar
+    return score < threshold   
 
 @app.route('/report')
 def report():
@@ -326,7 +387,6 @@ def data(table):
     query = 'SELECT max(`flight_Id`) FROM `flight`'
     cur.execute(query)
     flight_Id = cur.fetchone()[0]
-    print(flight_Id)
     query = 'SELECT timestamp FROM `%s` WHERE flight_Id=\'%s\'' % (table, flight_Id)
     cur.execute(query)
     results = cur.fetchall()
@@ -334,7 +394,6 @@ def data(table):
     # Count items per timestamp
     counts = {}
     for result in results:
-        print(result)
         timestamp = result[0].strftime("%H:%M:%S")
         counts[timestamp] = counts.get(timestamp, 0) + 1
 
@@ -344,10 +403,10 @@ def data(table):
 
     return jsonify({'timestamp': timestamp, 'item_count': item_count, 'total': total})
 
-def convert_blob_to_image(blob_data):
+def convert_blob_to_image(blob_data, unique_id):
     image_stream = io.BytesIO(blob_data)
     image = Image.open(image_stream)
-    temp_image_path = "temp_image.png"  # Temporary file path
+    temp_image_path = f"temp_image_{unique_id}.png"  # Generate a unique temporary file path
     image.save(temp_image_path, "PNG")
     return temp_image_path, image.size
 
@@ -419,12 +478,13 @@ def generate_pdf_with_data(table):
             y_position = draw_headers(height - 100)
 
         y_position -= row_height
-        image_path, (img_width, img_height) = convert_blob_to_image(pic)
+        image_path, (img_width, img_height) = convert_blob_to_image(pic, count)
         image_midpoint = y_position + row_height / 2 - img_height / 2
         c.drawImage(image_path, start_x + 200, image_midpoint, img_width, img_height)
         c.drawString(start_x, image_midpoint + img_height / 2, str(count))
         c.drawString(start_x + 400, image_midpoint + img_height / 2, str(timestamp))
         draw_vertical_lines(c, column_positions, start_y - 65, y_position)
+        os.remove(image_path)
 
     c.save()
 
