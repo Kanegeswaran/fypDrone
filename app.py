@@ -24,10 +24,10 @@ app.secret_key = "Plastic Detection Using Drone"
 app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
 
 db = mysql.connect(
-        host="sql12.freemysqlhosting.net",
-        user="sql12676329",
-        password="1S9CBCJtdr",
-        database="sql12676329"
+        host="localhost",
+        user="kanag",
+        password="@Dm1n123",
+        database="bonds"
     )
 
 
@@ -516,4 +516,4 @@ if __name__=="__main__":
 
     # loop = asyncio.get_event_loop()
     # loop.create_task(generate_frames_2())
-    app.run( host="0.0.0.0", port=5000, debug=True)
+    app.run( host="0.0.0.0", port=5000, debug=False)
